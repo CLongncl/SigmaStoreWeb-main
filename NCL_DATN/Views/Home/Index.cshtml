@@ -1,0 +1,256 @@
+﻿
+@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/layout.cshtml";
+}
+@using NCL_DATN.Models;
+@{
+    NCL_DATNEntities db = new NCL_DATNEntities();
+    var ch = new CurrencyHelper();
+}
+
+<!-- Start Slider -->
+<div id="slides-shop" class="cover-slides">
+    <ul class="slides-container">
+        <li class="text-left">
+            <img src="~/Image/layout/sigma_banner_01.jpg" alt=" " />
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="m-b-20"><strong>Chào mừng tới <br> Sigma Store</strong></h1>
+                        <p class="m-b-40">Nơi giúp bạn có thể lựa chọn những sản phẩm <br> hợp với ý bạn nhất.</p>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="text-center">
+            <img src="~/Image/layout/sigma_banner_02.jpg" alt=" " />
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="m-b-20"><strong>Chất lượng đảm bảo <br> Giá cả hợp lý</strong></h1>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="text-right">
+            <img src="~/Image/layout/sigma_banner_03.jpg" alt=" " />
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="m-b-20"><strong>Sản phẩm đa dạng <br /> cho mọi vóc dáng</strong></h1>
+                        @*<p class="m-b-40">Sản phẩm đa dạng cho cả người lớn và trẻ em <br></p>*@
+                        @*<p><a class="btn hvr-hover" href="#">Sigma Store</a></p>*@
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="slides-navigation">
+        <a href="#" class="next"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+        <a href="#" class="prev"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
+    </div>
+</div>
+<!-- End Slider -->
+@{
+    var categoryList = (from dmsp in db.tblDanhMucSanPhams
+                        orderby dmsp.PK_MaDanhMucSanPham
+                        select dmsp).Take(5).ToList();
+}
+<!-- Start Categories  -->
+<div class="categories-shop">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="shop-cat-box">
+                    <img class="img-fluid" src="~/Image/layout/sigma_category_01.jpg" alt="" />
+                    <a class="btn hvr-hover" href="/danh-sach-san-pham?maDmsp=@categoryList[0].PK_MaDanhMucSanPham">Giày</a>
+                </div>
+                <div class="shop-cat-box">
+                    <img class="img-fluid" src="~/Image/layout/sigma_category_05.jpg" alt="" />
+                    <a class="btn hvr-hover" href="/danh-sach-san-pham?maDmsp=@categoryList[4].PK_MaDanhMucSanPham">Phụ kiện</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="shop-cat-box">
+                    <img class="img-fluid" src="~/Image/layout/sigma_category_02.jpg" alt="" />
+                    <a class="btn hvr-hover" href="/danh-sach-san-pham?maDmsp=@categoryList[1].PK_MaDanhMucSanPham">Áo phông </a>
+                </div>
+                <div class="shop-cat-box">
+                    <img class="img-fluid" src="~/Image/layout/sigma_category_04.jpg" alt="" />
+                    <a class="btn hvr-hover" href="/danh-sach-san-pham?maDmsp=@categoryList[3].PK_MaDanhMucSanPham">Quần</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="shop-cat-box">
+                    <img class="img-fluid" src="~/Image/layout/sigma_category_03.jpg" alt="" />
+                    <a class="btn hvr-hover" href="/danh-sach-san-pham?maDmsp=@categoryList[2].PK_MaDanhMucSanPham">Áo khoác</a>
+                </div>
+                <div class="shop-cat-box">
+                    <img class="img-fluid" src="~/Image/layout/sigma_category_99.jpg" alt="" />
+                    <a class="btn hvr-hover" href="/danh-sach-san-pham?maDmsp=0">Các danh mục khác</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Categories -->
+@{
+    var top8SanPhamDauTien = (from sp in db.tblSanPhams
+                              select sp).AsEnumerable().Reverse().Take(8).ToList();
+}
+<!-- Start Products  -->
+<div class="products-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="title-all text-center">
+                    <h1>Sản phẩm nổi bật</h1>
+                    <p>Top những sản phẩm sẽ đem lại sự ấn tượng với bạn.</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="special-menu text-center">
+                    <div class="button-group filter-button-group">
+                        <button class="active" data-filter="*">Tất cả</button>
+                        <button data-filter=".top-featured">Bán chạy</button>
+                        <button data-filter=".best-seller">Giảm giá</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row special-list">
+            @{
+                foreach (var sp in top8SanPhamDauTien.Take(4)) { 
+                    <div class="col-lg-3 col-md-6 special-grid best-seller">
+                        <div class="products-single fix card-product-single">
+                            <div class="box-img-hover card-product-single-image">
+                                <div class="type-lb">
+                                    <p class="sale">Sale</p>
+                                </div>
+                                <img src="~/Images_Data/@sp.HinhAnh" class="img-fluid" alt="Image">
+                                <div class="mask-icon">
+                                    <a class="cart" name="addToCart" id="product_@sp.PK_MaSanPham" href="#" onclick="return false;">Thêm vào giỏ hàng</a>
+                                </div>
+                            </div>
+                        <div class="why-text card-product-single-name">
+                            <h4><a href="/chi-tiet-san-pham?maSp=@sp.PK_MaSanPham">@sp.TenSanPham</a></h4>
+                            <h5>@ch.FormatToCurrency(sp.DonGia)</h5>
+                        </div>
+                    </div>
+                </div>
+                }
+            }
+        </div>
+        <div class="row special-list">
+            @{
+                foreach (var sp in top8SanPhamDauTien.Skip(4).Take(4))
+                {
+                    <div class="col-lg-3 col-md-6 special-grid top-featured">
+                        <div class="products-single fix card-product-single">
+                            <div class="box-img-hover card-product-single-image">
+                                <div class="type-lb">
+                                    <p class="hot">Hot</p>
+                                </div>
+                                <img src="~/Images_Data/@sp.HinhAnh" class="img-fluid" alt="Image">
+                                <div class="mask-icon">
+                                    <a class="cart" name="addToCart" id="product_@sp.PK_MaSanPham" href="#" onclick="return false;">Thêm vào giỏ hàng</a>
+                                </div>
+                                @*<div class="text-center">
+                                    <button type="button" class="ml-auto btn hvr-hover" style="color:#ffffff">Thêm vào giỏ hàng</button>
+                                </div>*@
+                            </div>
+                            <div class="why-text card-product-single-name">
+                                <h4><a href="/chi-tiet-san-pham?maSp=@sp.PK_MaSanPham">@sp.TenSanPham</a></h4>
+                                <h5>@ch.FormatToCurrency(sp.DonGia)</h5>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+<!-- End Products  -->
+
+<script src="~/Theme/js/jquery-3.2.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".badge").text(countLi - 1);
+        $('#li_product_side_cart_0').hide();
+        $('a[name="addToCart"]').click(function () {
+            var idOfAddToCart = $(this).attr('id');
+            var splitedIdOfAddToCart = idOfAddToCart.toString().split('_');
+            var prodId = splitedIdOfAddToCart[1];
+            var obj = {
+                productId: prodId
+            }
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("UserThemSanPhamVaoGioHang", "Home")',
+                data: JSON.stringify(obj),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+
+                beforeSend: function () {
+
+                },
+                success: function (response) {
+                    var valueReturn = response;
+                    alert(valueReturn.msg);
+                    if (valueReturn.rdt == "1") {
+                        window.location.href = '@Url.Action("Login", "Home")';
+                    }
+                    if (valueReturn.pfa == "1") {
+                        addOneProductInSideCart(idOfAddToCart);
+                    }
+                },
+                failure: function (response) {
+                    alert("fail");
+                },
+                complete: function () {
+
+                },
+                error: function (xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    alert(err.Message);
+                },
+            });
+        });
+    });
+
+    var countLi = document.getElementById("ul_product_side_cart").getElementsByTagName("li").length;
+    function addOneProductInSideCart(idBtnAdd) {
+        var btnAddToCart = $('#' + idBtnAdd);
+        var divOfProduct = btnAddToCart.parent().parent().parent();
+        var findImageProd = divOfProduct.find('img')[0].src;
+        var findNameProd = divOfProduct.find('h4')[0].innerText;
+        var findPriceProd = divOfProduct.find('h5')[0].innerText;
+
+        var ulAllProductInSideCart = document.getElementById("ul_product_side_cart");
+        var firstProductInSideCart = document.getElementById("li_product_side_cart_0");
+        var cloneProductInSideCart = firstProductInSideCart.cloneNode(true);
+        cloneProductInSideCart.id = "li_product_side_cart_" + countLi;
+        cloneProductInSideCart.style.display = "";
+
+        // setup attr element in clone
+        var imgOfClone = cloneProductInSideCart.querySelector(".cart-thumb");
+        imgOfClone.src = findImageProd;
+
+        var splitedIdOfAddToCart = idBtnAdd.toString().split('_');
+        var prodId = splitedIdOfAddToCart[1];
+        var nameOfClone = cloneProductInSideCart.querySelector('a[name="linkProductSideCart"]');
+        nameOfClone.href = "/chi-tiet-san-pham?maSp=" + prodId;
+        nameOfClone.innerText = findNameProd;
+
+        var priceOfClone = cloneProductInSideCart.querySelector("span");
+        priceOfClone.innerText = findPriceProd;
+         
+        ulAllProductInSideCart.appendChild(cloneProductInSideCart);
+        $(".badge").text(countLi);
+        countLi = countLi + 1;
+    }
+</script>

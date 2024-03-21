@@ -1,0 +1,252 @@
+﻿
+@{
+    ViewBag.Title = "Giỏ Hàng";
+    Layout = "~/Views/Shared/layout.cshtml";
+}
+@using NCL_DATN.Models;
+@using NCL_DATN.Controllers;
+@{
+    NCL_DATNEntities db = new NCL_DATNEntities();
+    var ch = new CurrencyHelper();
+    int maGioHang = !HomeController.nguoidung.maGioHang.HasValue ? 0 : HomeController.nguoidung.maGioHang.Value;
+
+    // promotion
+    DateTime today = DateTime.Now.Date;
+    var productsAreOnPromotion = (from ctkm in db.tblChuongTrinhKhuyenMais
+                                  join ctctkm in db.tblChiTietKhuyenMais on ctkm.PK_MaChuongTrinhKhuyenMai equals ctctkm.FK_MaChuongTrinhKhuyenMai
+                                  orderby ctkm.NgayBatDau descending
+                                  where ctkm.NgayBatDau <= today && today <= ctkm.NgayKetThuc
+                                  select new
+                                  {
+                                      idPromotionProduct = ctctkm.FK_MaSanPham,
+                                      promotionPercent = ctkm.PhanTramGiamGia
+                                  });
+    //
+    var currentProductsInCart = (from ctdh in db.tblChiTietDonHangs
+                                 join paop in productsAreOnPromotion on ctdh.FK_MaSanPham equals paop.idPromotionProduct
+                                 into gj
+                                 from paop in gj.DefaultIfEmpty()
+                                 where ctdh.FK_MaDonHang == maGioHang
+                                 select new
+                                 {
+                                     FK_MaDonHang = ctdh.FK_MaDonHang,
+                                     FK_MaSanPham = ctdh.FK_MaSanPham,
+                                     SoLuongMua = ctdh.SoLuongMua,
+                                     DonGia = ctdh.tblSanPham.DonGia,
+                                     PhanTramGiamGia = paop != null ? paop.promotionPercent : 0 ,
+                                     GiaHienTai = paop != null ? (ctdh.tblSanPham.DonGia * (100 - paop.promotionPercent) / 100) : ctdh.tblSanPham.DonGia,
+                                     TenSanPham = ctdh.tblSanPham.TenSanPham,
+                                     KichCo = ctdh.tblSanPham.KichCo,
+                                     SoLuong = ctdh.tblSanPham.SoLuong,
+                                     HinhAnh = ctdh.tblSanPham.HinhAnh
+                                 }
+                                 ).ToList();
+    //
+    //var currentProductsInCart = (from sp in db.tblChiTietDonHangs
+    //                             where sp.FK_MaDonHang == maGioHang
+    //                             select new
+    //                             {
+    //                                 FK_MaDonHang = sp.FK_MaDonHang,
+    //                                 FK_MaSanPham = sp.FK_MaSanPham,
+    //                                 SoLuongMua = sp.SoLuongMua,
+    //                                 DonGia = sp.DonGia,
+    //                                 TenSanPham = sp.tblSanPham.TenSanPham,
+    //                                 KichCo = sp.tblSanPham.KichCo,
+    //                                 SoLuong = sp.tblSanPham.SoLuong,
+    //                                 HinhAnh = sp.tblSanPham.HinhAnh
+    //                             }
+    //                             ).ToList();
+    var listIds = currentProductsInCart.Select(p => p.FK_MaSanPham).ToArray();
+    var listPrices = currentProductsInCart.Select(p => p.DonGia).ToArray();
+    var listQuantityInStock = currentProductsInCart.Select(p => p.SoLuong).ToArray();
+    var listCurrentPrices = currentProductsInCart.Select(p => p.GiaHienTai).ToArray();
+    //var infoCurrentProductsInCart = db.tblSanPhams.Where(isp => currentProductsInCart.Contains(isp.PK_MaSanPham)).ToList();
+    //var totalPrice = infoCurrentProductsInCart.Sum(s => s.DonGia);
+}
+
+<div class="title-all text-center mt-5">
+    <h1>GIỎ HÀNG</h1>
+</div>
+@using (Html.BeginForm("ThanhToan", "Home", FormMethod.Post, new { @id = "formGioHang", @enctype = "multipart/form-data", @spellcheck = "false" }))
+{
+    <!-- Start Cart  -->
+    <div class="cart-box-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-main table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th class="text-center">Đơn giá</th>
+                                    <th style="width:100px;">Số lượng</th>
+                                    <th class="text-center" style="width:150px;">Tổng</th>
+                                    <th>Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var isp in currentProductsInCart)
+                                    {
+                                        <tr style="border-bottom: 1px solid gray">
+                                            <td class="thumbnail-img">
+                                                <img class="img-fluid" src="~/Images_Data/@isp.HinhAnh" alt="" />
+                                            </td>
+                                            <td class="name-pr">
+                                                <div>
+                                                    <a href="/chi-tiet-san-pham?maSp=@isp.FK_MaSanPham">
+                                                        @isp.TenSanPham
+                                                    </a>
+                                                    <input type="number" name="idProduct" value="@isp.FK_MaSanPham" hidden />
+                                                </div>
+                                                <p>Kho: @isp.SoLuong</p>
+                                            </td>
+                                            <td class="price-pr text-right">
+                                                @{
+                                                    if (isp.PhanTramGiamGia == 0)
+                                                    {
+                                                        <p id="dg_@isp.FK_MaSanPham">@ch.FormatToCurrency(isp.DonGia)</p>
+                                                        <input hidden name="currentPriceProduct" value="@isp.DonGia" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <h5><del>@ch.FormatToCurrency(isp.DonGia)</del></h5>
+                                                        <p>@ch.FormatToCurrency(isp.GiaHienTai)</p>
+                                                        <input hidden name="currentPriceProduct" value="@isp.GiaHienTai" />
+                                                    }
+                                                }
+                                            </td>
+                                            <td class="quantity-box text-right">
+                                                <input type="number" name="quantityProduct" id="sl_@isp.FK_MaSanPham" value=@isp.SoLuongMua min="1" step="1" class="c-input-text qty text" style="width:50px;" />
+                                            </td>
+                                            <td class="total-pr text-right">
+                                                <div id="tong_@isp.FK_MaSanPham">@ch.FormatToCurrency(isp.DonGia)</div>
+                                            </td>
+                                            <td class="remove-pr">
+                                                <a href="" onclick="return false;">
+                                                    <i class="fas fa-times" id="xoa_@isp.FK_MaSanPham"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row my-1">
+                <div class="col-lg-12">
+                    <h3 class="all-price-pr text-right w-100" id="totalAllPrices" style="padding-right: 86px;"></h3>
+                </div>
+            </div>
+
+            <div class="row my-5">
+                <div class="col-lg-6 col-sm-6">
+                    <div class="continue-shopping">
+                        <p><a href="\trang-chu"><u>Tiếp tục mua hàng</u></a></p>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <div class="update-box">
+                        <input value="Thanh toán" type="submit" id="btnCheckout" onclick="return checkSoLuongSanPhamHopLy()">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- End Cart -->
+}
+<script src="~/Theme/js/jquery-3.2.1.min.js"></script>
+<script>
+$(document).ready(function () {
+    tinhCacTongTien();
+    $("#btnCheckout").click(function () {    });
+    $("input[name='quantityProduct']").change(function () {
+        var split = $(this).attr('id').split('_');
+        var id = split[1];
+        tinhCacTongTien();
+    });
+    $("i").click(function () {
+        var splitIdProduct = $(this).attr('id').split('_');
+        var idSp = splitIdProduct[1];
+        userXoaSanPhamKhoiGioHang(idSp);
+    });
+});
+let formatCurrency = Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+var arrIdSanPham = new Array();
+var arrDonGiaSanPham = new Array();
+var arrGiaHienTaiSanPham = new Array();
+var arrSoLuongSanPham = new Array();
+var arrTongTienSanPham = new Array();
+var tongTienTatCa = 0;
+function tinhCacTongTien() {
+    arrIdSanPham = @Html.Raw(Json.Encode(listIds));
+    arrDonGiaSanPham = @Html.Raw(Json.Encode(listPrices));
+    arrGiaHienTaiSanPham = @Html.Raw(Json.Encode(listCurrentPrices));
+    arrSoLuongSanPham = $("input[name='quantityProduct']")
+        .map(function () { return $(this).val(); }).get();
+    var tongTienTemp = 0;
+    for (var i = 0; i < arrIdSanPham.length; i++) {
+        //var tongTienSanPham = arrDonGiaSanPham[i] * arrSoLuongSanPham[i];
+        var tongTienSanPham = arrGiaHienTaiSanPham[i] * arrSoLuongSanPham[i];
+
+        var pTong = document.getElementById("tong_" + arrIdSanPham[i]);
+        pTong.innerHTML = formatCurrency.format(tongTienSanPham);
+
+        tongTienTemp = tongTienTemp + tongTienSanPham;
+    }
+    tongTienTatCa = tongTienTemp;
+    $("#totalAllPrices").text("Tổng cộng: " + formatCurrency.format(tongTienTatCa));
+}
+function userXoaSanPhamKhoiGioHang(idSanPham) {
+    var obj = {
+        productId: idSanPham
+    }
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("UserXoaSanPhamKhoiGioHang", "Home")',
+        data: JSON.stringify(obj),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+
+        success: function (response) {
+            var valueReturn = response;
+            alert(valueReturn.msg);
+            if (valueReturn.scs == "1") {
+                location.reload();
+            }
+        },
+        error: function (xhr, status, error) {
+            var err = eval("(" + xhr.responseText + ")");
+            alert(err.Message);
+        },
+    });
+}
+var arrSoLuongTrongKho = @Html.Raw(Json.Encode(listQuantityInStock));;
+function checkSoLuongSanPhamHopLy() {
+    var countCheck = @currentProductsInCart.Count;
+    if (countCheck == 0) {
+        alert("Không có sản phẩm nào trong giỏ hàng!");
+        return false;
+    }
+    else {
+        for (var i = 0; i < arrSoLuongTrongKho.length; i++) {
+            if (arrSoLuongTrongKho[i] < arrSoLuongSanPham[i]) {
+                alert("Số lượng sản phẩm không hợp lệ!");
+                return false;
+            }
+            if (arrSoLuongSanPham[i] >= 50) {
+                alert("Nếu bạn có nhu cầu đặt mua số lượng lớn, vui lòng liên hệ trực tiếp với cửa hàng để nhận được giá bán sỉ tốt nhất \n Địa chỉ cửa hàng: số 29 ngõ 258 Tân Mai - Hoàng Mai - Hà Nội \n Hotline: 0396638066");
+                return false;
+            }
+        }
+        return true;
+    }
+}
+</script>

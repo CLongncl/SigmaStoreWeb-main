@@ -1,0 +1,166 @@
+﻿
+@{
+    ViewBag.Title = "Thanh Toán";
+    Layout = "~/Views/Shared/layout.cshtml";
+}
+
+@using NCL_DATN.Models;
+@using NCL_DATN.Controllers;
+@{
+    NCL_DATNEntities db = new NCL_DATNEntities();
+    var ch = new CurrencyHelper();
+    Guid maND = ViewBag.userId;
+    int maGioHang = !HomeController.nguoidung.maGioHang.HasValue ? 0 : HomeController.nguoidung.maGioHang.Value;
+
+    var infoCurrentProductsInCart = (from sp in db.tblChiTietDonHangs
+                                     where sp.FK_MaDonHang == maGioHang
+                                     select new
+                                     {
+                                         FK_MaDonHang = sp.FK_MaDonHang,
+                                         FK_MaSanPham = sp.FK_MaSanPham,
+                                         SoLuongMua = sp.SoLuongMua,
+                                         DonGia = sp.DonGia,
+                                         TenSanPham = sp.tblSanPham.TenSanPham,
+                                         KichCo = sp.tblSanPham.KichCo,
+                                         SoLuong = sp.tblSanPham.SoLuong,
+                                         HinhAnh = sp.tblSanPham.HinhAnh,
+                                         TongTienSanPham = sp.DonGia * sp.SoLuongMua
+                                     }
+                                 ).ToList();
+    var totalPrice = infoCurrentProductsInCart.Sum(s => s.TongTienSanPham);
+    var userInfo = (from nd in db.tblNguoiDungs
+                       where nd.PK_MaNguoiDung.Equals(maND)
+                       select nd).FirstOrDefault();
+}
+
+<div class="title-all text-center mt-5">
+    <h1>THANH TOÁN</h1>
+</div>
+<!-- Start Checkout  -->
+<div class="cart-box-main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-main table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th class="text-center">Đơn giá</th>
+                                <th style="width:100px;">Số lượng</th>
+                                <th class="text-center" style="width:150px;">Tổng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var isp in infoCurrentProductsInCart)
+                                {
+                                    <tr style="border-bottom: 1px solid gray">
+                                        <td class="thumbnail-img">
+                                            <img class="img-fluid" src="~/Images_Data/@isp.HinhAnh" alt="" />
+                                        </td>
+                                        <td class="name-pr">
+                                            <a href="#">
+                                                @isp.TenSanPham
+                                            </a>
+                                        </td>
+                                        <td class="price-pr text-right">
+                                            <p>@ch.FormatToCurrency(isp.DonGia)</p>
+                                        </td>
+                                        <td class="quantity-pr text-right">
+                                            <p>@isp.SoLuongMua</p>
+                                        </td>
+                                        <td class="total-pr text-right">
+                                            <p>@ch.FormatToCurrency(isp.TongTienSanPham)</p>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row my-1">
+            <div class="col-lg-12">
+                <h3 class="all-price-pr text-right w-100" style="padding-right: 11px;">Tổng cộng: @ch.FormatToCurrency(totalPrice)</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6 col-lg-6 mb-3">
+                <div class="checkout-address">
+                    <div class="title-left">
+                        <h3>Thông tin giao hàng</h3>
+                    </div>
+                    <form class="needs-validation" id="formInfoShipping" action="/Home/UserThanhToan" method="post">
+                        <div class="mb-3">
+                            <input type="checkbox" id="chkInfoShipping" />
+                            <label>Sử dụng địa chỉ và số điện thoại của tài khoản</label>
+                            <input type="text" name="receiverTemp" value="@userInfo.TenNguoiDung" hidden />
+                            <input type="text" name="addressTemp" value="@userInfo.DiaChi" hidden />
+                            <input type="text" name="phoneTemp" value="@userInfo.SoDienThoai" hidden />
+                        </div>
+                        <div class="mb-3">
+                            <label>Tên người nhận *</label>
+                            <input type="text" name="receiverShipping" class="form-control" autocomplete="off" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Địa chỉ *</label>
+                            <input type="text" name="addressShipping" class="form-control" autocomplete="off" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Số điện thoại *</label>
+                            <input type="tel" name="phoneShipping" class="form-control" autocomplete="off" pattern="[0-9]{10}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Ghi chú</label>
+                            <textarea rows="3" name="noteShipping" class="form-control" autocomplete="off"></textarea>
+                        </div>
+                        <hr class="mb-1">
+                    </form>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-6 mb-3">
+                
+            </div>
+        </div>
+
+        <div class="row mb-5 mt-2">
+            <div class="col-lg-6 col-sm-6">
+                <div class="continue-shopping">
+                    <p><a href="\gio-hang"><u>Về giỏ hàng</u></a></p>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-6">
+                <div class="update-box">
+                    <input value="Đặt hàng" type="submit" form="formInfoShipping" id="btnOrder">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- End Checkout -->
+
+<script src="~/Theme/js/jquery-3.2.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#btnBackToCart").click(function () {
+            window.location.href = '@Url.Action("GioHang", "Home")';
+        });
+        $("#chkInfoShipping").change(function () {
+            var uReceiver = $("input[name='receiverTemp']").val();
+            var uAddress = $("input[name='addressTemp']").val();
+            var uPhone = $("input[name='phoneTemp']").val();
+            if (this.checked) {
+                $("input[name='receiverShipping']").val(uReceiver);
+                $("input[name='addressShipping']").val(uAddress);
+                $("input[name='phoneShipping']").val(uPhone);
+            }
+        });
+    });
+</script>

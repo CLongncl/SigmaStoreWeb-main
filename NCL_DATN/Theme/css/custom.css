@@ -1,0 +1,272 @@
+
+a::before {
+    visibility: hidden
+}
+
+.header-bar {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.home-content {
+    padding: 15px;
+}
+
+.content-container {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/*login css*/
+.loginAll {
+    padding: 30px;
+    margin: auto;
+    width: 800px;
+}
+
+.loginForm {
+    width: 50%;
+    padding: 20px;
+    border: ridge #ff8585;
+    background-color: #ffeeee;
+}
+
+    .loginForm span {
+        margin: auto;
+    }
+/*end login css*/
+
+/*index*/
+.index-category-box {
+    height: 180px;
+    margin-bottom: 30px;
+    position: relative;
+    padding: 3px;
+    overflow: hidden;
+    border: 1px solid #010101;
+    transition: background 0.3s;
+    background-color: #d33b33;
+}
+
+    .index-category-box:hover a {
+        transform: scale(1.2);
+        background-color: #fd5d5d;
+    }
+
+    .index-category-box a {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 700;
+        color: #ffffff;
+        transition: 0.3s;
+    }
+
+/*end index css*/
+
+/*DanhSachSanPham css*/
+.banner {
+    background-size: cover;
+    text-align: center;
+    background-attachment: fixed;
+    padding-bottom: 20px;
+    position: center;
+}
+
+    .banner img {
+        width: 100%;
+        height: 300px;
+    }
+
+#list-group-men:active {
+    color: red;
+}
+
+a.selected {
+    color: red;
+    font-weight: 700;
+}
+
+.select-sort-pr {
+    width: 270px;
+    background: #ff5050;
+    color: #ffffff;
+    border-radius: 0;
+    border: none;
+}
+
+    .select-sort-pr:focus {
+        background-color: #ff5050;
+        color: #ffffff;
+    }
+
+        .select-sort-pr option {
+            background-color: #ffffff !important;
+            color: #000000;
+        }
+div.bootstrap-select::after {
+    content: "\e5c5";
+    font-family: "Material Icons";
+    font-size: 40px;
+    color: white;
+    z-index: 1000;
+    position: absolute;
+    top: -8px;
+    right: 0;
+}
+
+.img-product {
+    max-width: 100%;
+    /*height: 250px;*/
+}
+
+.card-product {
+    width: 295px;
+    height: 400px;
+}
+
+.card-product-single {
+    height: 100%;
+}
+
+.card-product-single-image {
+    height: 255px;
+}
+
+    .card-product-single-image img {
+        margin: auto;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+    }
+
+.card-product-single-name {
+}
+
+    .card-product-single-name h4 {
+        min-height: 38px;
+        padding-bottom: 0;
+        margin-bottom: 15px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .card-product-single-name h5 {
+        color: red;
+    }
+
+    .card-product-single-name a:hover {
+        color: #d33b33 !important;
+    }
+.product-name-in-list-view {
+    padding: 0 !important;
+    color: #1f1f1f !important;
+}
+
+.pagination {
+    float: right;
+    margin: 0 0 5px;
+}
+
+    .pagination li a {
+        font-size: 95%;
+        width: 30px;
+        height: 30px;
+        color: #999;
+        margin: 0 2px;
+        line-height: 30px;
+        border-radius: 30px !important;
+        text-align: center;
+        padding: 0;
+    }
+
+        .pagination li a:hover {
+            color: #666;
+        }
+
+    .pagination li.active a {
+        background: #d33b33 !important;
+        border-color: #d33b33 !important;
+    }
+
+        .pagination li.active a:hover {
+            background: #0397d6;
+        }
+
+    .pagination li.disabled i {
+        color: #ccc;
+    }
+
+    .pagination li i {
+        font-size: 16px;
+        padding-top: 6px
+    }
+/*end DanhSachSanPham css*/
+
+/*Gio hang*/
+.price-pr {
+    font-weight: 600;
+    color: #d33b33;
+}
+.total-pr {
+    font-weight: 600;
+    color: #d33b33;
+}
+.all-price-pr {
+    font-weight: 600;
+    color: #ff5050;
+}
+.quantity-pr {
+    font-weight: 600;
+    color: #d33b33;
+    text-align: center;
+}
+.remove-pr a:hover {
+    color: #d33b33;
+}
+.continue-shopping {
+    margin: 0;
+    position: absolute;
+    top: 25%;
+}
+.continue-shopping a {
+    color: #d33b33;
+}
+/*end gio hang*/
+
+/*thanh toan*/
+.choose-shipment-details {
+    color: #000000;
+    font-size: 16px;
+}
+/* end thanh toan*/
+
+/*chi tiet don hang*/
+.status-order {
+    width: fit-content;
+    margin: 0 auto;
+    padding: 10px;
+    background: #ff5050;
+    color: #f1f1f1;
+    font-size: 20px;
+    font-weight: 700;
+}
+/*end chi tiet don hang*/
+@media only screen and (max-width: 768px) {
+    .loginTitle {
+        padding: 10px 0px;
+    }
+
+    .loginForm {
+        width: 70%;
+        margin: auto;
+    }
+
+    .loginAll {
+        padding: 10px;
+        width: 100%;
+    }
+}
